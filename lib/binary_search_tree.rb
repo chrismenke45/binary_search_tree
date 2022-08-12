@@ -2,8 +2,7 @@ require "./lib/node.rb"
 
 class BinarySearchTree
   def initialize(arr)
-    @root = nil
-    build_tree(arr)
+    @root = build_tree(arr.uniq.sort)
   end
 
   def pretty_print(node = @root, prefix = "", is_left = true)
@@ -107,6 +106,29 @@ class BinarySearchTree
     end
   end
 
+  def balanced?
+    similar_heights_arr = self.preorder(@root) do |current_node|
+      right_height = current_node.right ? self.height(current_node.right) : 0
+      left_height = current_node.left ? self.height(current_node.left) : 0
+      left_height + 1 == right_height || left_height == right_height || left_height == right_height + 1
+    end
+    similar_heights_arr.all?
+  end
+
+  def rebalance
+    @root = self.build_tree(self.inorder)
+
+    def take_middle_split(arr)
+      middle_value = [arr[arr.length / 2]]
+      left_arr = arr[0..arr.length]
+      left_arr.pop
+      right_arr = arr[arr.length..-1]
+      right_arr.unshift
+      while left
+      end
+    end
+  end
+
   # BELOW IS "level_order" METHOD MADE ITERATIVELY
   #def level_orderr(&block)
   #nodes_array = [@root]
@@ -133,14 +155,18 @@ class BinarySearchTree
   end
 
   def build_tree(arr)
-    arr.each do |value|
-      if @root
-        new_node(value)
-      else
-        @root = Node.new(value) unless @root
-      end
-    end
+    return nil if arr.empty?
+    root = Node.new(arr[arr.length / 2])
+    root.left = build_tree(arr[0...arr.length / 2])
+    root.right = build_tree(arr[arr.length / 2 + 1..-1])
+    root
   end
+
+  #def build_tree(arr)
+  # arr.each_with_index do |value, index|
+  #    index == 0 ? @root = Node.new(value) : new_node(value)
+  #   end
+  #  end
 
   def new_node(data, current_node = @root)
     if current_node.data > data
